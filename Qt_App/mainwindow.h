@@ -12,7 +12,6 @@
 #include <QImage>
 #include <QPixmap>
 #include <QLabel>
-#include <QResizeEvent>
 
 class MainWindow : public QMainWindow
 {
@@ -22,7 +21,6 @@ public:
     QLabel my_label;
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void resizeEvent(QResizeEvent *);
 
 public slots:
     void my_quit();
