@@ -15,6 +15,11 @@
 #include <QResizeEvent>
 #include <QRect>
 #include <QRgb>
+#include <QDebug>
+#include <QPainter>
+#include <QSlider>
+#include <QGridLayout>
+#include <QVector>
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +27,7 @@ class MainWindow : public QMainWindow
 
 public:
     QLabel *my_label = new QLabel(this);
+    QLabel *my_3D_label = new QLabel();
     MainWindow(QWidget *parent = 0);
     void resizeEvent(QResizeEvent *my_event);
     ~MainWindow();
@@ -30,7 +36,8 @@ public slots:
     void my_quit();
     void openFile();
     void separate();
-    void new3d();
+    void paint3d(int);
+    void launch3d(bool);
 };
 
 #endif // MAINWINDOW_H
