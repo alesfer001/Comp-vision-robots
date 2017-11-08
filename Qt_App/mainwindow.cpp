@@ -33,6 +33,7 @@ MainWindow::~MainWindow()
 {
 }
 
+// Slot to quit the app
 void MainWindow::my_quit(){
     QMessageBox *mybox = new QMessageBox();
     mybox->setText("App exited succesfully!");
@@ -40,6 +41,9 @@ void MainWindow::my_quit(){
     QApplication::quit();
 }
 
+/* Slot to open image and show it in the window's qlabel
+ * To change default directory change the first line
+ */
 void MainWindow::openFile(){
     QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"), /*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO"*/ "/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO", tr("Images (*.png *.jpg *.gif)"));
 
@@ -67,11 +71,16 @@ void MainWindow::openFile(){
     }
 }
 
+// Method resizeEvent redefined to scale label containing the image to the new size of the window
 void MainWindow::resizeEvent(QResizeEvent *my_event){
     MainWindow::my_label->resize(my_event->size());
     MainWindow::my_label->setScaledContents(1);
 }
 
+/* Slot to crop the stereo images into different files
+ * Saves the two images created to be later used to make a red cyan 3d image
+ * To change the default save directories change the last two lines of the function
+ */
 void MainWindow::separate(){
     QRect my_rect_1(0, 0, 512, 576);
     QRect my_rect_2(512, 0, 512, 576);
@@ -85,6 +94,9 @@ void MainWindow::separate(){
     second_image.save(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg");
 }
 
+/* Function uses the two cropped images saved previously by MainWindow::separate() to extract red,green,blue components.
+ * Returns QVector containing two QImages, the first is the red component, the second is the green blue component.
+ */
 QVector<QImage> new3d(){
     QImageReader *my_img_reader = new QImageReader(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg");
     QImage first_image = my_img_reader->read();
@@ -119,6 +131,10 @@ QVector<QImage> new3d(){
     return tab;
 }
 
+/* Slot to paint the green blue component over the red component and show it in a new QLabel
+   with a slider widget to change the horizontal position of the two images
+ * int offset is the offset of the cyan component
+ */
 void MainWindow::paint3d(int offset){
 
     QVector<QImage> tab = new3d();
@@ -144,6 +160,7 @@ void MainWindow::paint3d(int offset){
     connect(my_slider, SIGNAL(valueChanged(int)), this, SLOT(paint3d(int)));
 }
 
+// Slot to paint the initial red cyan image with an offset set to 0
 void MainWindow::launch3d(bool b){
     MainWindow::paint3d(0);
 }
