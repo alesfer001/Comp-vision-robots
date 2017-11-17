@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *open_action = new QAction("&Open", this);
     QAction *sep_action = new QAction("&Separate", this);
     QAction *new3d_action = new QAction("&3D Image", this);
+    QAction *openCVMat = new QAction("openCV Image", this);
 
     this->resize(1024, 576);
 
@@ -19,6 +20,10 @@ MainWindow::MainWindow(QWidget *parent)
     file->addAction(new3d_action);
     file->addAction(quit_action);
 
+    QMenu *openCV = new QMenu("OpenCV");
+    openCV = menuBar()->addMenu("&OpenCV");
+    openCV->addAction(openCVMat);
+
     connect(quit_action, SIGNAL(triggered(bool)),
             this, SLOT(my_quit()));
     connect(open_action, SIGNAL(triggered(bool)),
@@ -27,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(separate()));
     connect(new3d_action, SIGNAL(triggered(bool)),
             this, SLOT(launch3d(bool)));
+    connect(openCVMat, SIGNAL(triggered(bool)),
+            this, SLOT(myOpenCVMat()));
 }
 
 MainWindow::~MainWindow()
@@ -45,7 +52,7 @@ void MainWindow::my_quit(){
  * To change default directory change the first line
  */
 void MainWindow::openFile(){
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"), /*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO"*/ "/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO", tr("Images (*.png *.jpg *.gif)"));
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"), "/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO" /*"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO"*/, tr("Images (*.png *.jpg *.gif)"));
 
     if(file_name != ""){
 
@@ -90,17 +97,17 @@ void MainWindow::separate(){
     QImage first_image = cropped_1.toImage();
     QImage second_image = cropped_2.toImage();
 
-    first_image.save(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg");
-    second_image.save(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg");
+    first_image.save("/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"/*"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"*/);
+    second_image.save("/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"/*"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"*/);
 }
 
 /* Function uses the two cropped images saved previously by MainWindow::separate() to extract red,green,blue components.
  * Returns QVector containing two QImages, the first is the red component, the second is the green blue component.
  */
 QVector<QImage> new3d(){
-    QImageReader *my_img_reader = new QImageReader(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg");
+    QImageReader *my_img_reader = new QImageReader("/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"/*"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg"*/);
     QImage first_image = my_img_reader->read();
-    my_img_reader = new QImageReader(/*"/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"*/"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg");
+    my_img_reader = new QImageReader("/net/cremi/alesfer/TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"/*"/home/alesfer/Desktop/Univ/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg"*/);
     QImage second_image = my_img_reader->read();
 
     QImage r_component = QPixmap(512, 576).toImage();
@@ -163,4 +170,11 @@ void MainWindow::paint3d(int offset){
 // Slot to paint the initial red cyan image with an offset set to 0
 void MainWindow::launch3d(bool b){
     MainWindow::paint3d(0);
+}
+
+void MainWindow::myOpenCVMat(){
+    QImage my_image = MainWindow::my_label->pixmap()->toImage();
+    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC3,(uchar*)my_image.bits(),my_image.bytesPerLine());
+    cv::imshow("Display", tmp);
+    cv::waitKey(5000);
 }

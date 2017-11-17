@@ -20,6 +20,7 @@
 #include <QSlider>
 #include <QGridLayout>
 #include <QVector>
+#include <opencv2/opencv.hpp>
 
 class MainWindow : public QMainWindow
 {
@@ -38,6 +39,7 @@ public slots:
     void separate();
     void paint3d(int);
     void launch3d(bool);
+    void myOpenCVMat();
 };
 
 #endif // MAINWINDOW_H
