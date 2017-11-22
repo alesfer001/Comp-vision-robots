@@ -21,6 +21,10 @@
 #include <QGridLayout>
 #include <QVector>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <iostream>
 
 class MainWindow : public QMainWindow
 {
@@ -31,6 +35,7 @@ public:
     QLabel *my_3D_label = new QLabel();
     MainWindow(QWidget *parent = 0);
     void resizeEvent(QResizeEvent *my_event);
+    void imSideBySide(QImage first_image, cv::Mat inMat);
     ~MainWindow();
 
 public slots:
@@ -40,6 +45,9 @@ public slots:
     void paint3d(int);
     void launch3d(bool);
     void myOpenCVMat();
+    void my_blur();
+    void my_sobel();
+    void my_canny();
 };
 
 #endif // MAINWINDOW_H

@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *sep_action = new QAction("&Separate", this);
     QAction *new3d_action = new QAction("&3D Image", this);
     QAction *openCVMat = new QAction("openCV Image", this);
+    QAction *blur = new QAction("Blur", this);
+    QAction *sobel = new QAction("Sobel", this);
+    QAction *canny = new QAction("Canny", this);
 
     this->resize(1024, 576);
 
@@ -23,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu *openCV = new QMenu("OpenCV");
     openCV = menuBar()->addMenu("&OpenCV");
     openCV->addAction(openCVMat);
+    openCV->addAction(blur);
+    openCV->addAction(sobel);
+    openCV->addAction(canny);
 
     connect(quit_action, SIGNAL(triggered(bool)),
             this, SLOT(my_quit()));
@@ -34,6 +40,12 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(launch3d(bool)));
     connect(openCVMat, SIGNAL(triggered(bool)),
             this, SLOT(myOpenCVMat()));
+    connect(blur, SIGNAL(triggered(bool)),
+            this, SLOT(my_blur()));
+    connect(sobel, SIGNAL(triggered(bool)),
+            this, SLOT(my_sobel()));
+    connect(canny, SIGNAL(triggered(bool)),
+            this, SLOT(my_canny()));
 }
 
 MainWindow::~MainWindow()
@@ -174,7 +186,69 @@ void MainWindow::launch3d(bool b){
 
 void MainWindow::myOpenCVMat(){
     QImage my_image = MainWindow::my_label->pixmap()->toImage();
-    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC3,(uchar*)my_image.bits(),my_image.bytesPerLine());
+    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
+                const_cast<uchar*>(my_image.bits()),
+                static_cast<size_t>(my_image.bytesPerLine())
+                );
+    cv::namedWindow("Display", CV_WINDOW_NORMAL);
     cv::imshow("Display", tmp);
-    cv::waitKey(5000);
+    cv::waitKey(0);
+}
+
+void MainWindow::imSideBySide(QImage first_image, cv::Mat inMat){
+    QImage second_image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step), QImage::Format_ARGB32 );
+
+    QPixmap *pixmap = new QPixmap(2048, 576);
+    QPainter *painter = new QPainter(pixmap);
+    painter->drawPixmap(0, 0, 1024, 576, QPixmap::fromImage(first_image));
+    painter->drawPixmap(1024, 0, 1024, 576, QPixmap::fromImage(second_image));
+    painter->end();
+
+    //MainWindow::my_label->repaint();
+    MainWindow::my_label->resize(QSize(2048, 576));
+    MainWindow::my_label->setPixmap(*pixmap);
+    //MainWindow::my_label->show();
+    //MainWindow::my_label->update();
+    //MainWindow::my_label->repaint();
+    //qApp->processEvents();
+}
+
+void MainWindow::my_blur(){
+    QImage my_image = MainWindow::my_label->pixmap()->toImage();
+    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
+                const_cast<uchar*>(my_image.bits()),
+                static_cast<size_t>(my_image.bytesPerLine())
+                );
+
+    cv::Mat blurred_image;
+    cv::blur(tmp, blurred_image, cv::Size(5, 5));
+
+    MainWindow::imSideBySide(my_image, blurred_image);
+}
+
+void MainWindow::my_sobel(){
+    QImage my_image = MainWindow::my_label->pixmap()->toImage();
+    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
+                const_cast<uchar*>(my_image.bits()),
+                static_cast<size_t>(my_image.bytesPerLine())
+                );
+
+    cv::Mat sobel_image;
+    cv::Sobel(tmp, sobel_image, CV_64F, 1, 0);
+
+    MainWindow::imSideBySide(my_image, sobel_image);
+}
+
+void MainWindow::my_canny(){
+    QImage my_image = MainWindow::my_label->pixmap()->toImage();
+    cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
+                const_cast<uchar*>(my_image.bits()),
+                static_cast<size_t>(my_image.bytesPerLine())
+                );
+
+    cv::Mat canny_image, gray;
+    cv::cvtColor(tmp, gray, CV_BGR2GRAY);
+    cv::Canny(gray, canny_image, 10, 5000, 3);
+
+    MainWindow::imSideBySide(my_image, canny_image);
 }
