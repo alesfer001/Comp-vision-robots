@@ -184,6 +184,7 @@ void MainWindow::launch3d(bool b){
     MainWindow::paint3d(0);
 }
 
+// Slot to display cv::Mat created from QImage
 void MainWindow::myOpenCVMat(){
     QImage my_image = MainWindow::my_label->pixmap()->toImage();
     cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
@@ -195,6 +196,7 @@ void MainWindow::myOpenCVMat(){
     cv::waitKey(0);
 }
 
+// Function to show first QImage and second QImage (created from cv::Mat) side by side
 void MainWindow::imSideBySide(QImage first_image, cv::Mat inMat){
     QImage second_image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step), QImage::Format_ARGB32 );
 
@@ -213,6 +215,7 @@ void MainWindow::imSideBySide(QImage first_image, cv::Mat inMat){
     //qApp->processEvents();
 }
 
+// Slot to apply blur effect to current image
 void MainWindow::my_blur(){
     QImage my_image = MainWindow::my_label->pixmap()->toImage();
     cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
@@ -226,6 +229,7 @@ void MainWindow::my_blur(){
     MainWindow::imSideBySide(my_image, blurred_image);
 }
 
+// Slot to apply sobel effect to current image
 void MainWindow::my_sobel(){
     QImage my_image = MainWindow::my_label->pixmap()->toImage();
     cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
@@ -239,6 +243,7 @@ void MainWindow::my_sobel(){
     MainWindow::imSideBySide(my_image, sobel_image);
 }
 
+// Slot to apply canny effect to current image
 void MainWindow::my_canny(){
     QImage my_image = MainWindow::my_label->pixmap()->toImage();
     cv::Mat tmp(my_image.height(), my_image.width(), CV_8UC4,
