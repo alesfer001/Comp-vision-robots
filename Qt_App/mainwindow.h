@@ -33,6 +33,8 @@ class MainWindow : public QMainWindow
 public:
     QLabel *my_label = new QLabel(this);
     QLabel *my_3D_label = new QLabel();
+    QLabel *cv_label = new QLabel();
+    QImage *my_img = new QImage();
     MainWindow(QWidget *parent = 0);
     void resizeEvent(QResizeEvent *my_event);
     void imSideBySide(QImage first_image, cv::Mat inMat);
