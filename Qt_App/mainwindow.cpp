@@ -228,7 +228,8 @@ void MainWindow::my_sobel(){
                 my_image.bytesPerLine());
 
     cv::Mat sobel_image;
-    cv::Sobel(tmp, sobel_image, CV_64F, 1, 0);
+    cv::Sobel(tmp, sobel_image, CV_16S, 1, 0, 3, 1, 0, cv::BORDER_DEFAULT);
+    //cv::Sobel(tmp, sobel_image, CV_64F, 1, 0);
 
     MainWindow::imSideBySide(my_image, sobel_image);
 }
@@ -242,7 +243,7 @@ void MainWindow::my_canny(){
 
     cv::Mat canny_image, gray;
     cv::cvtColor(tmp, gray, CV_BGR2GRAY);
-    cv::Canny(gray, canny_image, 10, 5000, 3);
+    cv::Canny(gray, canny_image, 50, 150, 3);
 
     MainWindow::imSideBySide(my_image, canny_image);
 }
