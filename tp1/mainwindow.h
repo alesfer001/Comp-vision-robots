@@ -62,6 +62,7 @@ private:
     void spliceImage(QImage* image[2]);
     QImage* rgbImage(QImage* image[2], int offset);
     void updateRGBSlider();
+    void hideLabels();
     void hideSliders();
 
     //opencv
@@ -69,11 +70,13 @@ private:
     QImage MatToQImage(const cv::Mat mat);
     void updateCannySlider();
 
-
+    //images
+    QImage* mainImage;
 
     //labels
-    QLabel* imageLabel;
-    QLabel* imageLabel2;
+    QLabel* mainLabel;
+    QLabel* RGBLabel;
+    QLabel* cvLabel;
 
     //menus
     QMenu* aboutMenu;
