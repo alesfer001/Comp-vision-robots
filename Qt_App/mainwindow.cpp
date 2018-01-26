@@ -61,7 +61,7 @@ void MainWindow::my_quit(){
  * To change default directory change the first line
  */
 void MainWindow::openFile(){
-    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"), "Stereo_Images/STEREO", tr("Images (*.png *.jpg *.gif)"));
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"), "TD/Comp-vision-robots/Stereo_Images/STEREO", tr("Images (*.png *.jpg *.gif)"));
 
     if(file_name != ""){
         QImageReader *my_img_reader = new QImageReader(file_name);
@@ -100,8 +100,8 @@ void MainWindow::separate(){
     QPixmap cropped_1 = MainWindow::my_label->pixmap()->copy(my_rect_1);
     QPixmap cropped_2 = MainWindow::my_label->pixmap()->copy(my_rect_2);
 
-    cropped_1.toImage().save("Stereo_Images/STEREO/Cropped_1.jpg");
-    cropped_2.toImage().save("Stereo_Images/STEREO/Cropped_2.jpg");
+    cropped_1.toImage().save("TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg");
+    cropped_2.toImage().save("TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg");
 }
 
 /* Function uses the two cropped images saved previously by MainWindow::separate() to extract red,green,blue components.
@@ -109,9 +109,9 @@ void MainWindow::separate(){
  */
 QVector<QImage> new3d(){
     //MainWindow::separate();
-    QImageReader *my_img_reader = new QImageReader("Stereo_Images/STEREO/Cropped_1.jpg");
+    QImageReader *my_img_reader = new QImageReader("TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_1.jpg");
     QImage first_image = my_img_reader->read();
-    my_img_reader = new QImageReader("Stereo_Images/STEREO/Cropped_2.jpg");
+    my_img_reader = new QImageReader("TD/Comp-vision-robots/Stereo_Images/STEREO/Cropped_2.jpg");
     QImage second_image = my_img_reader->read();
 
     QImage r_component = QPixmap(first_image.width(), first_image.height()).toImage();
