@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 
+    this->resize(1024, 576);
+
     //initialisation
     createLabels();
     createActions();
@@ -246,7 +248,6 @@ void MainWindow::updateRGBSlider() //cree le slider des images 3D
     rgbSlider->move(0, 25);
     rgbSlider->show();
     QSlider::connect(rgbSlider, SIGNAL(valueChanged(int)), this, SLOT(updateRGBImage(int)));
-
 }
 
 void MainWindow::updateCannySlider()
@@ -257,7 +258,6 @@ void MainWindow::updateCannySlider()
     cannySlider->move(0, 25);
     cannySlider->show();
     QSlider::connect(cannySlider, SIGNAL(valueChanged(int)), this, SLOT(updateCanny(int)));
-
 }
 
 void MainWindow::hideLabels(){
@@ -456,10 +456,10 @@ void MainWindow::displayDisparityMap()
 
         cv::Mat disparity;
 
-
+/*
         cv::StereoSGBM stereo = cv::StereoSGBM(0, 128, 7, 8 * 7 * 7 * 3, 32 * 3 * 7 * 7, 1, 63, 10, 100, 32, false);
         stereo.operator()(imageG, imageD, disparity);
-
+*/
         cv::imshow("Image OpenCV", disparity);
         cv::waitKey();
         cv::destroyWindow("Image OpenCV");
@@ -480,22 +480,25 @@ void MainWindow::displayDisparityMap()
 
 
 
-
                         /* EVENEMENTS */
 /* ---------------------------------------------------------- */
 
 
 void MainWindow::resizeEvent(QResizeEvent * event) //redefinition de l'event resize pour s'adapter automatiquement a la taille de l'image contenue dans le label
 {
-    if (cvLabel->pixmap() == NULL){
-        if (mainLabel->pixmap() != NULL){
-            QPixmap * filePixmap = new QPixmap(*(mainLabel->pixmap()));
-            filePixmap->scaled(event->size(), Qt::KeepAspectRatio);
-            mainLabel->setFixedSize(event->size());
-            mainLabel->setPixmap(*filePixmap);
-        }
+    if(mainLabel->pixmap() != NULL && cvLabel->pixmap() == NULL){
+        QPixmap *filePixmap = new QPixmap(*(mainLabel->pixmap()));
+        filePixmap->scaled(event->size(), Qt::KeepAspectRatio);
+        mainLabel->setFixedSize(event->size());
+        mainLabel->setPixmap(*filePixmap);
     }
-    else{
+    if(RGBLabel->pixmap() != NULL){
+        QPixmap *filePixmap = new QPixmap(*(RGBLabel->pixmap()));
+        filePixmap->scaled(event->size(), Qt::KeepAspectRatio);
+        RGBLabel->setFixedSize(event->size());
+        RGBLabel->setPixmap(*filePixmap);
+    }
+    if(cvLabel->pixmap() != NULL){
         QSize size = event->size();
         QPixmap * filePixmap = new QPixmap(*(cvLabel->pixmap()));
         filePixmap->scaled(size.width(), size.height()/2, Qt::KeepAspectRatio);
@@ -508,6 +511,9 @@ void MainWindow::resizeEvent(QResizeEvent * event) //redefinition de l'event res
         }
             mainLabel->setFixedSize(size.width(), size.height()/2);
             mainLabel->setPixmap(*filePixmap);
-
     }
+
+    mainLabel->update();
+    RGBLabel->update();
+    cvLabel->update();
 }
