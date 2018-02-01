@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <iostream>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QApplication>
@@ -17,11 +18,13 @@
 #include <QImage>
 #include <QColor>
 #include <QSlider>
+#include <QDebug>
 
 #include "opencv/cv.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/calib3d/calib3d.hpp"
+#include "opencv2/core/core.hpp"
 
 
 class MainWindow : public QMainWindow

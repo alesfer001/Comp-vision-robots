@@ -39,7 +39,8 @@ void MainWindow::createLabels() //cree les labels de la fenetre
     //imageLabel->move(0, 25);
     //problème : fenêtre pas resize -> 25 pixels du bas de l'image coupés
     cvLabel = new QLabel(this);
-    cvLabel->move(0, mainLabel->height());
+    //cvLabel->move(0, mainLabel->height());
+    cvLabel->move(mainLabel->width(), 0);
     mainImage = new QImage();
 }
 
@@ -358,8 +359,12 @@ void MainWindow::displayBlur()
         //cv::destroyWindow("Image OpenCV floutée");
         QPixmap* filePixmap = new QPixmap(QPixmap::fromImage(MatToQImage(mat)));
         scalePixmap(filePixmap, cvLabel);
+        /*
         this->resize(mainLabel->width(), mainLabel->height()+cvLabel->height());
         cvLabel->move(0, mainLabel->height());
+        */
+        this->resize(mainLabel->width()+cvLabel->width(), mainLabel->height());
+        cvLabel->move(mainLabel->width(), 0);
         rgbImageButton->hide();
         mainLabel->show();
         cvLabel->show();
@@ -386,8 +391,8 @@ void MainWindow::displaySobel()
 
         QPixmap* filePixmap = new QPixmap(QPixmap::fromImage(MatToQImage(mat)));
         scalePixmap(filePixmap, cvLabel);
-        this->resize(mainLabel->width(), mainLabel->height()+cvLabel->height());
-        cvLabel->move(0, mainLabel->height());
+        this->resize(mainLabel->width()+cvLabel->width(), mainLabel->height());
+        cvLabel->move(mainLabel->width(), 0);
         rgbImageButton->hide();
 
         mainLabel->show();
@@ -409,8 +414,8 @@ void MainWindow::displayCanny()
 
         QPixmap* filePixmap = new QPixmap(QPixmap::fromImage(MatToQImage(mat)));
         scalePixmap(filePixmap, cvLabel);
-        this->resize(mainLabel->width(), mainLabel->height()+cvLabel->height());
-        cvLabel->move(0, mainLabel->height());
+        this->resize(mainLabel->width()+cvLabel->width(), mainLabel->height());
+        cvLabel->move(mainLabel->width(), 0);
         updateCannySlider();
         rgbImageButton->hide();
 
@@ -432,8 +437,8 @@ void MainWindow::updateCanny(int lowTreshold)
 
         QPixmap* filePixmap = new QPixmap(QPixmap::fromImage(MatToQImage(mat)));
         scalePixmap(filePixmap, cvLabel);
-        this->resize(mainLabel->width(), mainLabel->height()+cvLabel->height());
-        cvLabel->move(0, mainLabel->height());
+        this->resize(mainLabel->width()+cvLabel->width(), mainLabel->height());
+        cvLabel->move(mainLabel->width(), 0);
         rgbImageButton->hide();
 
         mainLabel->show();
@@ -451,18 +456,22 @@ void MainWindow::displayDisparityMap()
         cv::Mat imageG = QImageToMat(rgbImages[0]);
         cv::Mat imageD = QImageToMat(rgbImages[1]);
 
-        //cv::cvtColor(imageG, imageG, CV_BGR2GRAY);
-        //cv::cvtColor(imageD, imageD, CV_BGR2GRAY);
+        cv::cvtColor(imageG, imageG, CV_BGR2GRAY);
+        cv::cvtColor(imageD, imageD, CV_BGR2GRAY);
 
         cv::Mat disparity;
+        disparity.create(imageG.size(), imageG.type());
 
-/*
-        cv::StereoSGBM stereo = cv::StereoSGBM(0, 128, 7, 8 * 7 * 7 * 3, 32 * 3 * 7 * 7, 1, 63, 10, 100, 32, false);
-        stereo.operator()(imageG, imageD, disparity);
-*/
+        cv::StereoBM *sbm = cv::StereoBM::create(16, 15);
+
+        //-- calculate the disparity image
+        sbm->compute(imageG, imageD, disparity);
+
+
         cv::imshow("Image OpenCV", disparity);
         cv::waitKey();
         cv::destroyWindow("Image OpenCV");
+
 
         /*cv::cvtColor(disparity, disparity, CV_GRAY2BGR);
 
@@ -486,30 +495,31 @@ void MainWindow::displayDisparityMap()
 
 void MainWindow::resizeEvent(QResizeEvent * event) //redefinition de l'event resize pour s'adapter automatiquement a la taille de l'image contenue dans le label
 {
+    QSize newSize = this->size();
     if(mainLabel->pixmap() != NULL && cvLabel->pixmap() == NULL){
         QPixmap *filePixmap = new QPixmap(*(mainLabel->pixmap()));
-        filePixmap->scaled(event->size(), Qt::KeepAspectRatio);
-        mainLabel->setFixedSize(event->size());
+        filePixmap->scaled(newSize, Qt::KeepAspectRatio);
+        mainLabel->setFixedSize(newSize);
         mainLabel->setPixmap(*filePixmap);
     }
     if(RGBLabel->pixmap() != NULL){
         QPixmap *filePixmap = new QPixmap(*(RGBLabel->pixmap()));
-        filePixmap->scaled(event->size(), Qt::KeepAspectRatio);
-        RGBLabel->setFixedSize(event->size());
+        filePixmap->scaled(newSize, Qt::KeepAspectRatio);
+        RGBLabel->setFixedSize(newSize);
         RGBLabel->setPixmap(*filePixmap);
     }
     if(cvLabel->pixmap() != NULL){
-        QSize size = event->size();
+        QSize size = newSize;
         QPixmap * filePixmap = new QPixmap(*(cvLabel->pixmap()));
         filePixmap->scaled(size.width(), size.height()/2, Qt::KeepAspectRatio);
-        cvLabel->setFixedSize(size.width(), size.height()/2);
+        cvLabel->setFixedSize(size.width()/2, size.height());
         cvLabel->setPixmap(*filePixmap);
         if (mainLabel->pixmap() != NULL){
             filePixmap = new QPixmap(*(mainLabel->pixmap()));
-            filePixmap->scaled(size.width(), size.height()/2, Qt::KeepAspectRatio);
-            cvLabel->move(0, mainLabel->height());
+            filePixmap->scaled(size.width()/2, size.height(), Qt::KeepAspectRatio);
+            cvLabel->move(mainLabel->width(), 0);
         }
-            mainLabel->setFixedSize(size.width(), size.height()/2);
+            mainLabel->setFixedSize(size.width()/2, size.height());
             mainLabel->setPixmap(*filePixmap);
     }
 
