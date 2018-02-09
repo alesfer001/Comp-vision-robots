@@ -461,16 +461,44 @@ void MainWindow::displayDisparityMap()
 
         cv::Mat disparity;
         disparity.create(imageG.size(), imageG.type());
+/*
+        cv::StereoBM sbm;
+        sbm.state->SADWindowSize = 15;
+        sbm.state->numberOfDisparities = 96;
+        sbm.state->preFilterSize = 5;
+        sbm.state->preFilterCap = 16;
+        sbm.state->minDisparity = 0;
+        sbm.state->textureThreshold = 507;
+        sbm.state->uniquenessRatio = 0;
+        sbm.state->speckleWindowSize = 100;
+        sbm.state->speckleRange = 8;
+        sbm.state->disp12MaxDiff = 20;
+        sbm.state->trySmallerWindows = 1;
+        sbm(imageG, imageD, disparity);
+*/
 
-        cv::StereoBM *sbm = cv::StereoBM::create(16, 15);
+        cv::StereoSGBM sgbm;
+        sgbm.SADWindowSize = 5;
+        sgbm.numberOfDisparities = 112;
+        sgbm.preFilterCap = 16;
+        sgbm.minDisparity = 0;
+        sgbm.uniquenessRatio = 1;
+        sgbm.speckleWindowSize = 100;
+        sgbm.speckleRange = 20;
+        sgbm.disp12MaxDiff = 20;
+        sgbm.fullDP = true;
+        sgbm.P1 = 600;
+        sgbm.P2 = 2400;
+        sgbm(imageG, imageD, disparity);
 
-        //-- calculate the disparity image
-        sbm->compute(imageG, imageD, disparity);
+
+        cv::Mat disparity8;
+        cv::normalize(disparity, disparity8, 0, 255, CV_MINMAX, CV_8U);
 
 
-        cv::imshow("Image OpenCV", disparity);
+        cv::imshow("Disparity Map", disparity8);
         cv::waitKey();
-        cv::destroyWindow("Image OpenCV");
+        cv::destroyWindow("Disparity Map");
 
 
         /*cv::cvtColor(disparity, disparity, CV_GRAY2BGR);
